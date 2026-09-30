@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoToken | Next-Gen Blockchain Circular Economy Platform</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- REAL GOOGLE IDENTITY SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    /* =======================================================
+       THEME & COLOR TOKENS
+       ======================================================= */
+    :root, [data-theme="light"] {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-alt: #F1F5F9;
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      
+      --primary: #10B981;
+      --primary-dark: #047857;
+      --primary-soft: #D1FAE5;
+      --cyan: #06B6D4;
+      --cyan-soft: #CFFAFE;
+      --gold: #F59E0B;
+      --gold-soft: #FEF3C7;
+      --blue: #2563EB;
+      --blue-soft: #DBEAFE;
+      --purple: #8B5CF6;
+      
+      --radius: 20px;
+      --radius-sm: 10px;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 14px 30px -6px rgba(16, 185, 129, 0.15), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+      --hero-overlay-start: rgba(255, 255, 255, 0.45);
+      --hero-overlay-end: #FFFFFF;
+    }
+
+    [data-theme="dark"] {
+      --bg: #090E1A;
+      --surface: #111A2E;
+      --surface-alt: #1A263E;
+      --header-bg: rgba(17, 26, 46, 0.94);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #22324E;
+      
+      --primary: #10B981;
+      --primary-dark: #34D399;
+      --primary-soft: rgba(16, 185, 129, 0.18);
+      --cyan: #38BDF8;
+      --cyan-soft: rgba(56, 189, 248, 0.18);
+      --gold: #FBBF24;
+      --gold-soft: rgba(251, 191, 36, 0.18);
+      --blue: #60A5FA;
+      --blue-soft: rgba(96, 165, 250, 0.18);
+      --purple: #A78BFA;
+
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 16px 36px -5px rgba(0, 0, 0, 0.55);
+      --hero-overlay-start: rgba(17, 26, 46, 0.45);
+      --hero-overlay-end: #111A2E;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease; }
+    body { background: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; position: relative; }
+
+    #bgCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+    #confettiCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999; pointer-events: none; }
+
+    /* Sticky Navigation */
+    header {
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0.95rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 900;
+      font-size: 1.35rem;
+      color: var(--primary);
+      cursor: pointer;
+      user-select: none;
+    }
+    .brand span { color: var(--text-main); }
+    .nav-links { display: flex; gap: 1.65rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+      cursor: pointer;
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-toggle-btn:hover { border-color: var(--primary); transform: scale(1.05); }
+
+    /* Flashy Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.3rem;
+      font-size: 0.875rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255,255,255,0.28), transparent);
+      transform: rotate(30deg) translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    .btn:hover::after { transform: rotate(30deg) translateX(100%); }
+    .btn:active { transform: scale(0.96); }
+
+    .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: #fff; box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35); }
+    .btn-primary:hover { box-shadow: 0 8px 25px rgba(16, 185, 129, 0.55); transform: translateY(-2px); }
+    .btn-gold { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; }
+    .btn-blue { background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: #fff; }
+    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: var(--surface-alt); border-color: var(--primary); transform: translateY(-2px); }
+    .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.775rem; }
+    .btn-block { width: 100%; }
+
+    /* Layout & Hero */
+    main { flex: 1; max-width: 1240px; margin: 0 auto; padding: 2.25rem 1.5rem; width: 100%; position: relative; z-index: 1; }
+    .hero {
+      position: relative;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 4.8rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 2.5rem;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .hero-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.22; filter: saturate(1.2); z-index: 1; }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, var(--hero-overlay-start) 0%, var(--hero-overlay-end) 100%);
+      z-index: 2;
+    }
+    .hero-content { position: relative; z-index: 3; max-width: 880px; margin: 0 auto; }
+    .hero-beam {
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #10B981, #06B6D4, #8B5CF6, #F59E0B, #10B981);
+      background-size: 400% 100%;
+      animation: laserBeam 4s linear infinite;
+      z-index: 4;
+    }
+    @keyframes laserBeam { 0% { background-position: 0% 0%; } 100% { background-position: 400% 0%; } }
+
+    .glow-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1.1rem; background: var(--surface); color: var(--primary);
+      border-radius: 9999px; font-size: 0.775rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px;
+      border: 1px solid var(--primary-soft);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 { font-size: clamp(2.2rem, 4.4vw, 3.2rem); font-weight: 900; letter-spacing: -0.04em; margin-bottom: 1.25rem; line-height: 1.18; }
+    .gradient-text {
+      background: linear-gradient(135deg, #059669 0%, #10B981 50%, #06B6D4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.65; max-width: 760px; margin-left: auto; margin-right: auto; }
+    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* Live Counters */
+    .live-ticker-pulse { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 10px #10B981; margin-right: 4px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+
+    .finance-card { border-top: 4px solid var(--primary); }
+    .finance-card.gold-top { border-top-color: var(--gold); }
+    .finance-card.blue-top { border-top-color: var(--cyan); }
+    .finance-card.purple-top { border-top-color: var(--purple); }
+    .finance-card .f-label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+    .finance-card .f-value { font-size: 1.95rem; font-weight: 900; margin: 0.4rem 0 0.25rem; }
+    .finance-card .f-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+    .live-stream-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2.5rem; box-shadow: var(--shadow-sm); }
+    .live-stream-feed { display: flex; flex-direction: column; gap: 0.65rem; max-height: 240px; overflow-y: hidden; margin-top: 1rem; }
+    .feed-item {
+      display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;
+      background: var(--surface-alt); border-radius: var(--radius-sm); font-size: 0.825rem;
+      border: 1px solid var(--border); animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .feed-item.user-highlight { border-color: var(--primary); background: var(--primary-soft); }
+    @keyframes popIn { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+    /* Cards */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; box-shadow: var(--shadow-sm); }
+    .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .card-head h3 { font-size: 1.15rem; font-weight: 800; }
+
+    .pillar-card { display: flex; flex-direction: column; align-items: flex-start; }
+    .icon-circle {
+      font-size: 1.5rem; background: var(--primary-soft); width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    /* Telemetry Radar & Meters */
+    .sonar-wrapper { display: inline-flex; align-items: center; gap: 0.5rem; }
+    .sonar-emitter { position: relative; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
+    .sonar-emitter::before {
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      border: 2px solid var(--primary); animation: sonarPulse 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    }
+    @keyframes sonarPulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+
+    .bin-meter { width: 130px; height: 10px; background: var(--surface-alt); border-radius: 999px; overflow: hidden; position: relative; border: 1px solid var(--border); }
+    .bin-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+
+    /* Progress Pipeline */
+    .progress-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.5rem; }
+    .progress-track { display: flex; justify-content: space-between; align-items: center; position: relative; margin: 2rem 1rem 1.5rem 1rem; }
+    .progress-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--border); transform: translateY(-50%); z-index: 1; }
+    .progress-line-fill { position: absolute; top: 50%; left: 0; height: 4px; background: var(--primary); transform: translateY(-50%); z-index: 2; transition: width 0.6s ease; }
+    .step-node { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .step-circle { width: 38px; height: 38px; border-radius: 50%; background: var(--surface); border: 3px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--text-muted); }
+    .step-node.completed .step-circle { border-color: var(--primary); background: var(--primary); color: #FFFFFF; }
+    .step-node.active .step-circle { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+    .step-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+
+    /* Itemized Charges Breakdown */
+    .charges-box { background: var(--surface-alt); border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 1rem; margin: 0.85rem 0 1.15rem; }
+    .charge-row { display: flex; justify-content: space-between; font-size: 0.825rem; margin-bottom: 0.35rem; color: var(--text-muted); }
+    .charge-row.total-row { border-top: 1px solid var(--border); padding-top: 0.4rem; margin-top: 0.4rem; font-weight: 800; color: var(--text-main); font-size: 0.9rem; }
+
+    /* Payment Mode Selectors */
+    .pay-mode-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.15rem; }
+    .pay-mode-option { border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 0.85rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem; }
+    .pay-mode-option.selected { border-color: var(--primary); background: var(--primary-soft); }
+    .pay-mode-title { font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
+    .pay-mode-desc { font-size: 0.725rem; color: var(--text-muted); }
+
+    /* Tables */
+    .table-card { overflow-x: auto; padding: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { padding: 0.95rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--surface-alt); font-weight: 700; color: var(--text-muted); font-size: 0.775rem; text-transform: uppercase; }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--primary); font-weight: 700; }
+
+    /* Status Pills */
+    .status-pill { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; }
+    .status-active { background: var(--primary-soft); color: var(--primary); }
+    .status-warning { background: var(--gold-soft); color: var(--gold); }
+    .status-blue { background: var(--blue-soft); color: var(--blue); }
+    .pulse-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulseGreen 1.6s infinite; }
+    @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center; z-index: 100; padding: 1.25rem;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-card {
+      background: var(--surface); border-radius: var(--radius); padding: 2.4rem 2.2rem;
+      width: 100%; max-width: 450px; position: relative; box-shadow: 0 25px 60px -15px rgba(16, 185, 129, 0.3); border: 1px solid var(--border);
+    }
+    .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; font-size: 1.6rem; color: var(--text-muted); cursor: pointer; }
+    
+    .auth-toggle { display: flex; background: var(--surface-alt); padding: 5px; border-radius: 12px; margin-bottom: 1.4rem; }
+    .auth-toggle-btn { flex: 1; padding: 0.6rem; font-size: 0.85rem; font-weight: 800; border: none; background: transparent; color: var(--text-muted); border-radius: 8px; cursor: pointer; }
+    .auth-toggle-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    .social-btn-group { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.25rem; }
+    .x-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem; border: none;
+      background: #000000; border-radius: 8px; font-size: 0.875rem; font-weight: 700; color: #FFFFFF; cursor: pointer;
+    }
+    .x-btn svg { width: 18px; height: 18px; fill: #FFFFFF; }
+    .google-btn-wrapper { display: flex; justify-content: center; width: 100%; }
+
+    .auth-separator { display: flex; align-items: center; text-align: center; margin: 1.25rem 0; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+    .auth-separator::before, .auth-separator::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
+    .auth-separator span { padding: 0 0.75rem; }
+
+    .form-group { margin-bottom: 1.15rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-main); }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.9rem; outline: none; background: var(--surface); color: var(--text-main);
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+
+    /* Toast */
+    .toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000; display: flex; flex-direction: column; gap: 0.75rem; }
+    .toast {
+      background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--primary);
+      border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; font-weight: 600;
+    }
+
+    /* AI Assistant Interface */
+    .ai-bubble-btn {
+      position: fixed; bottom: 1.75rem; right: 1.75rem; width: 62px; height: 62px;
+      background: linear-gradient(135deg, #10B981, #059669); color: #FFF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(16, 185, 129, 0.45);
+      cursor: pointer; z-index: 900; border: 3px solid #FFF;
+    }
+    .ai-chat-window {
+      position: fixed; bottom: 6.5rem; right: 1.75rem; width: 380px; height: 510px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.18); z-index: 900; display: flex; flex-direction: column;
+      overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s ease;
+    }
+    .ai-chat-window.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .ai-chat-header { background: linear-gradient(90deg, #047857, #10B981); color: #FFF; padding: 1.1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+    .ai-messages-body { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; background: var(--surface-alt); }
+    .ai-msg { max-width: 88%; padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.835rem; line-height: 1.5; }
+    .ai-msg-bot { background: var(--surface); color: var(--text-main); align-self: flex-start; border: 1px solid var(--border); }
+    .ai-msg-user { background: var(--primary); color: #FFFFFF; align-self: flex-end; }
+    .ai-quick-prompts { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.6rem 0.85rem; background: var(--surface); border-top: 1px solid var(--border); }
+    .ai-pill-btn { font-size: 0.725rem; padding: 0.35rem 0.65rem; border-radius: 999px; background: var(--surface-alt); border: 1px solid var(--border); cursor: pointer; font-weight: 700; color: var(--primary); }
+    .ai-input-bar { display: flex; padding: 0.75rem; background: var(--surface); border-top: 1px solid var(--border); gap: 0.5rem; }
+    .ai-input-bar input { flex: 1; padding: 0.6rem 0.9rem; border: 1px solid var(--border); border-radius: 20px; font-size: 0.825rem; outline: none; background: var(--surface); color: var(--text-main); }
+    .ai-send-btn { background: var(--primary); color: #FFF; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    footer { background: var(--surface); border-top: 1px solid var(--border); padding: 2.2rem 1.5rem; margin-top: auto; }
+    .footer-wrap { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="confettiCanvas"></canvas>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Header with Seamless Home & Workspace Navigation -->
+  <header>
+    <div class="nav-container">
+      <div class="brand" onclick="navigateToHome()">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span>EcoToken</span>
+      </div>
+      <ul class="nav-links">
+        <li><a onclick="navigateToHome()">Home</a></li>
+        <li><a href="#live-orders" onclick="navigateToHome()">Live Feed</a></li>
+        <li><a href="#architecture" onclick="navigateToHome()">Architecture</a></li>
+        <li><a href="#hubs" onclick="navigateToHome()">Smart Hubs</a></li>
+        <li><a href="#ledger" onclick="navigateToHome()">Provenance Ledger</a></li>
+      </ul>
+      <div class="nav-actions" id="guestActions">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <span class="themeIconSpan">🌙</span>
+        </button>
+        <button class="btn btn-outline" id="openCitizenLogin">Customer Sign In</button>
+        <button class="btn btn-primary" id="openOwnerLogin">Recycler Admin</button>
+      </div>
+      <div class="nav-actions" id="userActions" style="display: none;">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <span class="themeIconSpan">🌙</span>
+        </button>
+        <!-- SEAMLESS SWITCHER BACK TO WORKSPACE WITHOUT LOGGING OUT -->
+        <button class="btn btn-primary btn-sm" id="btnReturnToWorkspace" onclick="returnToWorkspace()">
+          ⚡ Return to Workspace
+        </button>
+        <span class="status-pill status-active" id="navUserBadge">Account</span>
+        <button class="btn btn-outline btn-sm" id="navLogout">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Landing View -->
+    <section id="landingView">
+      <div class="hero">
+        <div class="hero-beam"></div>
+        <video class="hero-video" autoplay muted loop playsinline>
+          <!-- Using your uploaded nature video clip -->
+          <source src="Vite + React + TS.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="glow-badge">
+            <span class="pulse-dot"></span> SDEC-2026-002 • Clean &amp; Green Technology[cite: 1]
+          </div>
+          <h1>Turn Household Recyclables Into <span class="gradient-text">Verified Web3 Assets</span></h1>
+          <p>India’s first circular economy protocol that verifies material provenance on-chain, guarantees instant token liquidity for citizens, and enables automated factory settlements[cite: 1].</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" style="font-size:1rem; padding:0.85rem 1.8rem;" id="heroActionBtn" onclick="openCustomerAuth()">🚀 Customer Sign In / Fast Register</button>
+            <button class="btn btn-outline" style="font-size:1rem; padding:0.85rem 1.8rem;" onclick="openModal(ownerModal)">Recycler Admin Portal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE FINANCIAL ACCUMULATOR -->
+      <div id="analytics" class="section-heading">
+        <h2>Live Real-Time Financial Accumulator (Updating Per Second)</h2>
+        <p>Dynamic platform arbitrage yield and on-chain order throughput updating live across Indian recycling corridors[cite: 1].</p>
+      </div>
+      <div class="grid-4">
+        <div class="card finance-card">
+          <div class="f-label">
+            <span>Gross Processed Lots</span>
+            <span class="status-pill status-active" style="padding:1px 6px; font-size:0.65rem;">LIVE</span>
+          </div>
+          <div class="f-value" id="liveGrossRevenue" style="color: var(--primary);">₹1,84,32,450</div>
+          <div class="f-sub">+₹320 earned per second</div>
+        </div>
+        <div class="card finance-card gold-top">
+          <div class="f-label">
+            <span>Net Arbitrage Profit</span>
+            <span class="status-pill status-warning" style="padding:1px 6px; font-size:0.65rem;">ACCUMULATING</span>
+          </div>
+          <div class="f-value" id="liveNetProfit" style="color: var(--gold);">₹46,24,180</div>
+          <div class="f-sub">+₹85 net profit per second</div>
+        </div>
+        <div class="card finance-card blue-top">
+          <div class="f-label">
+            <span>Fulfilled Orders</span>
+            <span class="status-pill status-blue" style="padding:1px 6px; font-size:0.65rem;">REAL-TIME</span>
+          </div>
+          <div class="f-value" id="liveTotalOrders" style="color: var(--cyan);">42,891</div>
+          <div class="f-sub">Continuous orders placing now[cite: 1]</div>
+        </div>
+        <div class="card finance-card purple-top">
+          <div class="f-label">
+            <span>Diverted Material</span>
+            <span class="status-pill status-active" style="padding:1px 6px; font-size:0.65rem;">MT SCALING</span>
+          </div>
+          <div class="f-value" id="liveTotalKg" style="color: var(--purple);">742,810 kg</div>
+          <div class="f-sub">~1,233 MT CO₂ Offset[cite: 1]</div>
+        </div>
+      </div>
+
+      <!-- LIVE STREAM ORDER FEED -->
+      <div id="live-orders" class="live-stream-box">
+        <div class="card-head" style="margin-bottom:0.25rem;">
+          <div>
+            <h3>Live Network Order Pulse (On-Chain Transactions Ingesting)</h3>
+            <p style="font-size:0.825rem; color:var(--text-muted);">Decentralized collection telemetry streaming live from automated hubs across India[cite: 1].</p>
+          </div>
+          <span class="status-pill status-active"><span class="pulse-dot"></span>Streaming Active</span>
+        </div>
+        <div class="live-stream-feed" id="liveOrderFeed"></div>
+      </div>
+
+      <!-- PROBLEM SCOPE & ARCHITECTURE -->
+      <div id="architecture" class="section-heading">
+        <h2>Circular Architecture (SDEC-2026-002)</h2>
+        <p>Three core layers closing India's circular economy verification gap[cite: 1].</p>
+      </div>
+      <div class="grid-3">
+        <div class="card pillar-card">
+          <div class="icon-circle">🌱</div>
+          <h4 style="font-size:1.15rem; font-weight:700; margin-bottom:0.4rem;">Citizen Incentivization</h4>
+          <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.6;">Register, place orders with Advance or Visit Pay, and mint ERC-20 utility tokens for municipal perks[cite: 1].</p>
+        </div>
+        <div class="card pillar-card">
+          <div class="icon-circle">📜</div>
+          <h4 style="font-size:1.15rem; font-weight:700; margin-bottom:0.4rem;">Batch Provenance &amp; Re-opening</h4>
+          <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.6;">Recyclers issue cryptographic batch certificates, close settled deliveries, and retain rights to re-open cases if audits demand[cite: 1].</p>
+        </div>
+        <div class="card pillar-card">
+          <div class="icon-circle">🤝</div>
+          <h4 style="font-size:1.15rem; font-weight:700; margin-bottom:0.4rem;">Owner Customization Suite</h4>
+          <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.6;">Inspect customer tickets, mark orders "On The Way", adjust scale weights, and close orders with net token payouts.</p>
+        </div>
+      </div>
+
+      <!-- SMART BIN NETWORK -->
+      <div id="hubs" class="section-heading">
+        <h2>Active Smart Bin Network</h2>
+        <p>Telemetry collection partners updating capacity and material states[cite: 1].</p>
+      </div>
+      <div class="card table-card" style="margin-bottom: 2.5rem;">
+        <table>
+          <thead>
+            <tr><th>Hub ID</th><th>Location</th><th>Accepted Streams</th><th>Dynamic Telemetry Level</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>HUB-NCR-01</strong></td>
+              <td>Connaught Circle, Gate 4</td>
+              <td>PET Plastic, HDPE</td>
+              <td>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <div class="bin-meter"><div class="bin-fill" style="width: 58%; background: var(--primary);"></div></div>
+                  <span style="font-weight:700; font-size:0.8rem;">58%</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-active"><span class="sonar-wrapper"><span class="sonar-emitter"></span>Live Telemetry</span></span></td>
+            </tr>
+            <tr>
+              <td><strong>HUB-NCR-04</strong></td>
+              <td>Cyber City Footbridge</td>
+              <td>Aluminum Cans, Mixed Rigid</td>
+              <td>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <div class="bin-meter"><div class="bin-fill" style="width: 34%; background: var(--primary);"></div></div>
+                  <span style="font-weight:700; font-size:0.8rem;">34%</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-active"><span class="sonar-wrapper"><span class="sonar-emitter"></span>Live Telemetry</span></span></td>
+            </tr>
+            <tr>
+              <td><strong>HUB-NCR-09</strong></td>
+              <td>Green Park Metro Station</td>
+              <td>PET Bottles, Glass</td>
+              <td>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <div class="bin-meter"><div class="bin-fill" style="width: 89%; background: var(--gold);"></div></div>
+                  <span style="font-weight:700; font-size:0.8rem; color:var(--gold);">89%</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-warning"><span class="pulse-dot pulse-warning"></span>Collector En Route</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LIVE LEDGER -->
+      <div id="ledger" class="card table-card">
+        <div class="card-head" style="padding: 1.25rem;">
+          <h3>Real-Time Provenance Ledger</h3>
+          <span class="status-pill status-active">Sepolia Testnet Live[cite: 1]</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Transaction Hash</th><th>Contract Event</th><th>Stream</th><th>Payload</th><th>Status</th></tr>
+          </thead>
+          <tbody id="publicLedgerBody">
+            <tr>
+              <td class="mono">0x74a2...99ee</td>
+              <td>CitizenMint()</td>
+              <td>PET Polyethylene</td>
+              <td>3.4 kg (+34 ECO)</td>
+              <td><span class="status-pill status-active">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td class="mono">0x21bb...aa10</td>
+              <td>BatchCertification()</td>
+              <td>Crushed Aluminum</td>
+              <td>640 kg (Grade A)</td>
+              <td><span class="status-pill status-active">Confirmed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Authenticated Dashboard -->
+    <section id="dashboardView" style="display: none;">
+      <div class="dash-banner">
+        <span class="status-pill status-active" id="dashRolePill">Customer Portal</span>
+        <h2 id="dashWelcomeTitle">Workspace</h2>
+      </div>
+
+      <!-- CUSTOMER PROGRESS PIPELINE -->
+      <div class="progress-panel" id="customerProgressSection">
+        <div class="card-head" style="margin-bottom:0.25rem;">
+          <div>
+            <h3>Active Request Tracking Pipeline</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);" id="activeTicketStatusText">Monitoring verification status on test network.</p>
+          </div>
+          <span class="status-pill status-active" id="activeTicketPill">Order Placed</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-line-fill" id="progressLineFill" style="width: 25%;"></div>
+          
+          <div class="step-node completed" id="stepNode1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Order Placed</div>
+          </div>
+          <div class="step-node active" id="stepNode2">
+            <div class="step-circle">2</div>
+            <div class="step-label">On The Way</div>
+          </div>
+          <div class="step-node" id="stepNode3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Scale Verified</div>
+          </div>
+          <div class="step-node" id="stepNode4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Completed &amp; Closed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="dashMetrics"></div>
+
+      <div class="grid-2">
+        <div class="card" id="primaryActionCard"></div>
+        <div class="card" id="secondaryActionCard"></div>
+      </div>
+
+      <!-- OWNER CUSTOMIZATION & ORDER CLOSURE PANEL -->
+      <div class="card table-card" id="ownerCustRequestCard" style="margin-bottom: 1.5rem; display: none;">
+        <div class="card-head" style="padding: 1.25rem;">
+          <div>
+            <h3>Customer Live Orders &amp; Dispatch Terminal</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Update orders to "On The Way", inspect scale reading, and complete/close orders.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="ownerRefreshBtn" onclick="refreshOwnerLiveOrders()" style="display:flex; align-items:center; gap:0.4rem;">
+            <span>🔄</span> Refresh Terminal
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Ticket ID</th><th>Customer</th><th>Pickup Place</th><th>Material</th><th>Pay Mode</th><th>Claimed Wt.</th><th>Charges Breakdown</th><th>Net Payout</th><th>Status</th><th>Owner Action</th></tr>
+          </thead>
+          <tbody id="custRequestTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card table-card">
+        <div class="card-head" style="padding: 1.25rem;">
+          <h3 id="dashTableHeading">Activity Stream</h3>
+        </div>
+        <table>
+          <thead id="dashTableHead"></thead>
+          <tbody id="dashTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- CUSTOMER LOGIN MODAL -->
+  <div class="modal-overlay" id="citizenModal">
+    <div class="modal-card">
+      <button class="modal-close" data-close>&times;</button>
+      
+      <div class="auth-toggle">
+        <button class="auth-toggle-btn active" id="tabBtnLogin" onclick="switchCitizenTab('login')">Sign In</button>
+        <button class="auth-toggle-btn" id="tabBtnRegister" onclick="switchCitizenTab('register')">Create Account</button>
+      </div>
+
+      <div style="text-align:center; margin-bottom:1.25rem;">
+        <span class="status-pill status-active" style="font-size:0.7rem; margin-bottom:0.4rem;">⚡ 1-Click Secure Sign-In</span>
+        <h3 style="font-size:1.4rem; font-weight:900;">Welcome to EcoToken</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted);">Sign in to unlock waste pickup orders and token minting.</p>
+      </div>
+
+      <div class="social-btn-group">
+        <div class="google-btn-wrapper">
+          <div id="g_id_onload"
+               data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+               data-callback="handleRealGoogleLogin"
+               data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin"
+               data-type="standard"
+               data-shape="rectangular"
+               data-theme="outline"
+               data-text="signin_with"
+               data-size="large"
+               data-logo_alignment="left"
+               data-width="360">
+          </div>
+        </div>
+
+        <button type="button" class="x-btn" onclick="handleRealXLogin()">
+          <svg viewBox="0 0 24 24">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          Sign in with X (Twitter)
+        </button>
+      </div>
+
+      <div class="auth-separator"><span>Or with email</span></div>
+
+      <div id="citizenLoginFormSection">
+        <form id="citizenLoginForm">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="inputCitizenId" value="citizen@gmail.com" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="inputCitizenPass" value="Citizen#123" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In &amp; Unlock Ordering</button>
+        </form>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; padding:0.65rem; background:var(--surface-alt); border:1px dashed var(--border); border-radius:6px; text-align:center;">
+          Demo: <code>citizen@gmail.com</code> | <code>Citizen#123</code>
+        </div>
+      </div>
+
+      <div id="citizenRegisterFormSection" style="display: none;">
+        <form id="citizenRegisterForm">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="regCitizenName" placeholder="e.g. Rahul Sharma" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regCitizenEmail" placeholder="yourname@gmail.com" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label>Password (min 4 characters)</label>
+            <input type="password" id="regCitizenPass" placeholder="Create a secure password" required minlength="4" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Create Account &amp; Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWNER LOGIN MODAL -->
+  <div class="modal-overlay" id="ownerModal">
+    <div class="modal-card">
+      <button class="modal-close" data-close>&times;</button>
+      <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; font-weight:900;">Owner / Recycler Terminal</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Access batch certification, dispatch controls &amp; settlements[cite: 1].</p>
+      <form id="ownerLoginForm">
+        <div class="form-group">
+          <label>Admin ID</label>
+          <input type="text" id="inputOwnerId" value="Ashwani@ecotoken.com" required />
+        </div>
+        <div class="form-group">
+          <label>Security Password</label>
+          <input type="password" id="inputOwnerPass" value="OwnerEco#2026" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign In as Recycler Admin</button>
+      </form>
+      <div style="font-size:0.75rem; color:var(--text-muted); margin-top:1rem; padding:0.65rem; background:var(--surface-alt); border:1px dashed var(--border); border-radius:6px; text-align:center;">
+        Admin ID: <code>Ashwani@ecotoken.com</code> | <code>OwnerEco#2026</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ASSISTANT WIDGET (ECOBOT) -->
+  <div class="ai-bubble-btn" onclick="toggleAIChat()">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </div>
+
+  <div class="ai-chat-window" id="aiChatWindow">
+    <div class="ai-chat-header">
+      <h4 style="font-size:0.95rem; font-weight:800;">EcoBot AI Guide &amp; Order Desk</h4>
+      <button style="background:none;border:none;color:#fff;cursor:pointer;font-size:1.2rem;" onclick="toggleAIChat()">&times;</button>
+    </div>
+
+    <div class="ai-messages-body" id="aiMessages">
+      <div class="ai-msg ai-msg-bot">
+        👋 Hi! I am your <strong>EcoToken AI Guide</strong>. I can calculate your separate pickup fees, explain advance payment, or place orders for you!
+      </div>
+    </div>
+
+    <div class="ai-quick-prompts">
+      <button class="ai-pill-btn" onclick="sendQuickPrompt('What are the separate pickup charges?')">💵 Charges Breakdown</button>
+      <button class="ai-pill-btn" onclick="sendQuickPrompt('What is advance pay vs visit pay?')">💳 Payment Modes</button>
+      <button class="ai-pill-btn" onclick="sendQuickPrompt('Place order for 5 kg plastic with Advance Pay at Green Park')">⚡ Place Order</button>
+    </div>
+
+    <div class="ai-input-bar">
+      <input type="text" id="aiUserInput" placeholder="Ask or place order..." onkeypress="if(event.key==='Enter') sendAIMessage()" />
+      <button class="ai-send-btn" onclick="sendAIMessage()">➤</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-wrap">
+      <div>EcoToken Circular Economy Framework • SDEC-2026-002[cite: 1]</div>
+      <div>Seamless Multi-Session &amp; Navigation Release[cite: 1]</div>
+    </div>
+  </footer>
+
+  <script>
+    /* =======================================================
+       THEME CONTROLLER (SILENT TOGGLE - NO NOTIFICATION POPUP)
+       ======================================================= */
+    let currentTheme = localStorage.getItem('ecotoken_theme') || 'light';
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('ecotoken_theme', theme);
+      const iconSpans = document.querySelectorAll('.themeIconSpan');
+      iconSpans.forEach(el => { el.textContent = theme === 'dark' ? '☀️' : '🌙'; });
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(currentTheme);
+      // Switched silently: notification popup call completely removed
+    }
+
+    applyTheme(currentTheme);
+
+    /* Background Canvas */
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: null, y: null, radius: 150 };
+
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+    window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.2 + 1.2;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+
+        if (mouse.x != null && mouse.y != null) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            this.x -= dx * 0.02;
+            this.y -= dy * 0.02;
+          }
+        }
+      }
+      draw() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.fillStyle = isDark ? 'rgba(16, 185, 129, 0.45)' : 'rgba(16, 185, 129, 0.28)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(Math.floor((canvas.width * canvas.height) / 14000), 70);
+      for (let i = 0; i < count; i++) particles.push(new Particle());
+    }
+    initParticles();
+    window.addEventListener('resize', initParticles);
+
+    function animateBackground() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          let dx = particles[i].x - particles[j].x;
+          let dy = particles[i].y - particles[j].y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 125) {
+            let opacity = (1 - distance / 125) * (isDark ? 0.25 : 0.16);
+            ctx.strokeStyle = `rgba(16, 185, 129, ${opacity})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
+
+    /* Confetti System */
+    const confCanvas = document.getElementById('confettiCanvas');
+    const confCtx = confCanvas.getContext('2d');
+    let confettiList = [];
+
+    function resizeConfetti() { confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
+
+    function fireConfetti(mode = 'citizen') {
+      let colors = ['#10B981', '#34D399', '#06B6D4', '#F59E0B', '#10B981'];
+      if (mode === 'owner') colors = ['#F59E0B', '#FBBF24', '#10B981', '#FFFFFF'];
+      if (mode === 'blue') colors = ['#3B82F6', '#60A5FA', '#93C5FD', '#10B981', '#FFFFFF'];
+
+      for (let i = 0; i < 90; i++) {
+        confettiList.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2 + 50,
+          w: Math.random() * 9 + 4,
+          h: Math.random() * 9 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 18,
+          vy: (Math.random() - 1.2) * 16,
+          tiltAngle: 0,
+          opacity: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      confettiList.forEach((c, idx) => {
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vy += 0.38;
+        c.opacity -= 0.012;
+        confCtx.fillStyle = c.color;
+        confCtx.globalAlpha = Math.max(c.opacity, 0);
+        confCtx.fillRect(c.x, c.y, c.w, c.h);
+        if (c.opacity <= 0) confettiList.splice(idx, 1);
+      });
+      confCtx.globalAlpha = 1;
+      requestAnimationFrame(renderConfetti);
+    }
+    renderConfetti();
+
+    /* Live Counters */
+    let grossRevenue = 18432450;
+    let netProfit = 4624180;
+    let totalOrders = 42891;
+    let totalKg = 742810;
+
+    const hubCities = ['Delhi Hub #04', 'Bengaluru Smart Hub', 'Mumbai Central Bin', 'Hyderabad Bio-Hub', 'Meerut Green Center'];
+    const hubMaterials = ['PET Plastic (Grade A)', 'Aluminium Cans', 'Rigid HDPE Polyethylene', 'Crushed Glass Lots'];
+
+    function formatRupees(val) { return '₹' + val.toLocaleString('en-IN'); }
+
+    setInterval(() => {
+      grossRevenue += Math.floor(Math.random() * 240 + 120);
+      netProfit += Math.floor(Math.random() * 65 + 35);
+      totalKg += Math.floor(Math.random() * 3 + 1);
+
+      document.getElementById('liveGrossRevenue').textContent = formatRupees(grossRevenue);
+      document.getElementById('liveNetProfit').textContent = formatRupees(netProfit);
+      document.getElementById('liveTotalKg').textContent = totalKg.toLocaleString() + ' kg';
+    }, 1000);
+
+    setInterval(() => {
+      totalOrders += 1;
+      document.getElementById('liveTotalOrders').textContent = totalOrders.toLocaleString();
+
+      const randomCity = hubCities[Math.floor(Math.random() * hubCities.length)];
+      const randomMat = hubMaterials[Math.floor(Math.random() * hubMaterials.length)];
+      const randomWeight = (Math.random() * 8 + 1.5).toFixed(1);
+      const earnedTokens = Math.round(randomWeight * (randomMat.includes('Alum') ? 25 : 10));
+      const fakeHash = '0x' + Math.random().toString(16).substring(2, 6) + '...' + Math.random().toString(16).substring(2, 6);
+
+      appendOrderToLiveFeed(randomCity, randomMat, randomWeight, earnedTokens, fakeHash, false);
+    }, 3200);
+
+    function appendOrderToLiveFeed(origin, material, weight, tokens, txHash, isUser = false) {
+      const feed = document.getElementById('liveOrderFeed');
+      if (!feed) return;
+
+      const div = document.createElement('div');
+      div.className = `feed-item ${isUser ? 'user-highlight' : ''}`;
+      div.innerHTML = `
+        <div>
+          <strong style="color:var(--primary);">${sanitize(origin)}:</strong> ${isUser ? '⭐ New Placed Order:' : 'Verified Stream:'} <strong>${weight} kg</strong> of ${sanitize(material)}
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-weight:800; color:var(--gold);">+${tokens} ECO</span>
+          <span class="mono">${txHash}</span>
+        </div>
+      `;
+      feed.insertBefore(div, feed.firstChild);
+      if (feed.children.length > 5) feed.removeChild(feed.lastChild);
+    }
+
+    appendOrderToLiveFeed('Delhi Hub #04', 'PET Plastic (Grade A)', '4.2', 42, '0x88f2...b109');
+    appendOrderToLiveFeed('Bengaluru Smart Hub', 'Aluminium Cans', '2.5', 63, '0x22c4...e881');
+    appendOrderToLiveFeed('Meerut Green Center', 'Rigid HDPE', '6.0', 48, '0x99da...41aa');
+
+    /* Global State & Persistent Storage */
+    let currentCustomerSession = null;
+    let isOwnerLoggedIn = false;
+    let selectedPayMode = 'advance';
+    
+    let registeredCitizens = JSON.parse(localStorage.getItem('ecotoken_citizens')) || [
+      { name: 'Demo Customer', email: 'citizen@gmail.com', pass: 'Citizen#123', tokens: 420, weight: 68.5 }
+    ];
+
+    let customerRequests = JSON.parse(localStorage.getItem('ecotoken_requests')) || [
+      { id: 'REQ-101', customer: 'citizen@gmail.com', place: 'Green Park Main Market, Meerut', material: 'PET Plastic', payMode: 'Advance Token Pay', claimedWeight: 3.5, verifiedWeight: 3.5, rate: 10, grossTokens: 35, pickupFee: 30, scaleFee: 15, netTokens: 35, status: 'Pending Review' }
+    ];
+
+    let ownerBatches = [
+      { id: 'BATCH-NCR-890', stream: 'Grade A', mass: 1240, hash: '0x33cf...12da', status: 'Open', payout: 3720 }
+    ];
+
+    const citizenModal = document.getElementById('citizenModal');
+    const ownerModal = document.getElementById('ownerModal');
+
+    function openModal(el) { closeModals(); el.classList.add('active'); }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active')); }
+    document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', closeModals));
+
+    function openCustomerAuth() { switchCitizenTab('login'); openModal(citizenModal); }
+
+    function switchCitizenTab(tab) {
+      document.getElementById('citizenLoginFormSection').style.display = (tab === 'login') ? 'block' : 'none';
+      document.getElementById('citizenRegisterFormSection').style.display = (tab === 'register') ? 'block' : 'none';
+      document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
+    }
+
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (type === 'error') toast.style.borderLeftColor = '#EF4444';
+      if (type === 'gold') toast.style.borderLeftColor = '#F59E0B';
+      toast.innerHTML = `<span>${type === 'gold' ? '📊' : (type === 'error' ? '⚠️' : '⚡')}</span> <span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function sanitize(str) {
+      if (!str) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', "/": '&#x2F;' };
+      return String(str).replace(/[&<>"'/]/ig, match => map[match]);
+    }
+
+    /* SEAMLESS HOME & WORKSPACE NAVIGATION */
+    function navigateToHome() {
+      document.getElementById('landingView').style.display = 'block';
+      document.getElementById('dashboardView').style.display = 'none';
+      closeModals();
+
+      if (currentCustomerSession || isOwnerLoggedIn) {
+        document.getElementById('guestActions').style.display = 'none';
+        document.getElementById('userActions').style.display = 'flex';
+        document.getElementById('btnReturnToWorkspace').style.display = 'inline-flex';
+        
+        const heroBtn = document.getElementById('heroActionBtn');
+        if (heroBtn) {
+          heroBtn.textContent = '⚡ Go to My Active Workspace';
+          heroBtn.onclick = returnToWorkspace;
+        }
+      } else {
+        document.getElementById('guestActions').style.display = 'flex';
+        document.getElementById('userActions').style.display = 'none';
+        
+        const heroBtn = document.getElementById('heroActionBtn');
+        if (heroBtn) {
+          heroBtn.textContent = '🚀 Customer Sign In / Fast Register';
+          heroBtn.onclick = openCustomerAuth;
+        }
+      }
+    }
+
+    function returnToWorkspace() {
+      if (isOwnerLoggedIn) {
+        initOwnerDashboard();
+      } else if (currentCustomerSession) {
+        initCitizenDashboard();
+      } else {
+        openCustomerAuth();
+      }
+    }
+
+    /* Google Login */
+    function handleRealGoogleLogin(response) {
+      if (!response.credential) { showToast('Google login failed', 'error'); return; }
+      try {
+        const base64Url = response.credential.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        const googleUser = JSON.parse(jsonPayload);
+        
+        const verifiedEmail = googleUser.email.toLowerCase();
+        const verifiedName = googleUser.name || 'Google User';
+
+        registeredCitizens = JSON.parse(localStorage.getItem('ecotoken_citizens')) || registeredCitizens;
+        let matched = registeredCitizens.find(c => c.email.toLowerCase() === verifiedEmail);
+
+        if (!matched) {
+          matched = { name: verifiedName, email: verifiedEmail, pass: 'GOOGLE_OAUTH_VERIFIED', tokens: 50, weight: 0.0 };
+          registeredCitizens.push(matched);
+          localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+        }
+
+        currentCustomerSession = matched;
+        isOwnerLoggedIn = false;
+        showToast(`Authenticated via Google: ${verifiedName}`);
+        initCitizenDashboard();
+      } catch (err) {
+        showToast('Failed to parse Google identity token', 'error');
+      }
+    }
+
+    /* X (Twitter) OAuth */
+    function handleRealXLogin() {
+      const width = 600, height = 650;
+      const left = window.innerWidth / 2 - width / 2;
+      const top = window.innerHeight / 2 - height / 2;
+      showToast('Connecting to X OAuth...');
+
+      const xAuthUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YOUR_X_CLIENT_ID&redirect_uri=${encodeURIComponent(window.location.origin)}&scope=users.read%20tweet.read&state=ecotoken_2026&code_challenge=challenge&code_challenge_method=plain`;
+      const xPopup = window.open(xAuthUrl, 'XAuthPopup', `width=${width},height=${height},top=${top},left=${left}`);
+
+      const popupInterval = setInterval(() => {
+        if (!xPopup || xPopup.closed) {
+          clearInterval(popupInterval);
+          const handle = prompt('Enter your verified X handle (e.g. @ecowarrior):');
+          if (handle && handle.trim() !== '') {
+            const clean = handle.trim().replace('@', '');
+            const xEmail = `${clean.toLowerCase()}@x.com`;
+            const xName = `@${clean}`;
+
+            registeredCitizens = JSON.parse(localStorage.getItem('ecotoken_citizens')) || registeredCitizens;
+            let matched = registeredCitizens.find(c => c.email.toLowerCase() === xEmail);
+            if (!matched) {
+              matched = { name: xName, email: xEmail, pass: 'X_OAUTH_VERIFIED', tokens: 50, weight: 0.0 };
+              registeredCitizens.push(matched);
+              localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+            }
+            currentCustomerSession = matched;
+            isOwnerLoggedIn = false;
+            showToast(`Authenticated via X: ${xName}`);
+            initCitizenDashboard();
+          }
+        }
+      }, 800);
+    }
+
+    /* Email Auth */
+    document.getElementById('citizenLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('inputCitizenId').value.trim().toLowerCase();
+      const pass = document.getElementById('inputCitizenPass').value.trim();
+
+      registeredCitizens = JSON.parse(localStorage.getItem('ecotoken_citizens')) || registeredCitizens;
+      const matched = registeredCitizens.find(c => c.email.toLowerCase() === email && c.pass === pass);
+
+      if (matched) {
+        currentCustomerSession = matched;
+        isOwnerLoggedIn = false;
+        showToast(`Welcome back, ${matched.name}!`);
+        initCitizenDashboard();
+      } else {
+        showToast('Invalid customer email or password', 'error');
+      }
+    });
+
+    document.getElementById('citizenRegisterForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regCitizenName').value.trim();
+      const email = document.getElementById('regCitizenEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('regCitizenPass').value.trim();
+
+      registeredCitizens = JSON.parse(localStorage.getItem('ecotoken_citizens')) || registeredCitizens;
+      if (registeredCitizens.some(c => c.email.toLowerCase() === email)) {
+        showToast('Email already registered', 'error');
+        switchCitizenTab('login');
+        return;
+      }
+
+      const newCitizen = { name, email, pass, tokens: 0, weight: 0.0 };
+      registeredCitizens.push(newCitizen);
+      localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+
+      currentCustomerSession = newCitizen;
+      isOwnerLoggedIn = false;
+      showToast(`Account created! Welcome, ${name}.`);
+      initCitizenDashboard();
+    });
+
+    /* Owner Login (Ashwani@ecotoken.com) */
+    document.getElementById('ownerLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('inputOwnerId').value.trim();
+      const pass = document.getElementById('inputOwnerPass').value.trim();
+
+      if (id.toLowerCase() === 'ashwani@ecotoken.com' && pass === 'OwnerEco#2026') {
+        isOwnerLoggedIn = true;
+        currentCustomerSession = null;
+        showToast('Admin Terminal Access Granted to Ashwani');
+        initOwnerDashboard();
+      } else {
+        showToast('Invalid admin email or password', 'error');
+      }
+    });
+
+    document.getElementById('openCitizenLogin').addEventListener('click', openCustomerAuth);
+    document.getElementById('openOwnerLogin').addEventListener('click', () => openModal(ownerModal));
+    
+    document.getElementById('navLogout').addEventListener('click', () => {
+      currentCustomerSession = null;
+      isOwnerLoggedIn = false;
+      showToast('Signed out of session');
+      navigateToHome();
+    });
+
+    function checkCustomerAuth() {
+      if (!currentCustomerSession) {
+        showToast('Access Restricted: Please sign in to place an order!', 'error');
+        openCustomerAuth();
+        return false;
+      }
+      return true;
+    }
+
+    function setPaymentMode(mode) {
+      selectedPayMode = mode;
+      document.getElementById('payModeAdvance').classList.toggle('selected', mode === 'advance');
+      document.getElementById('payModeVisit').classList.toggle('selected', mode === 'visit');
+      updateLiveChargesPreview();
+    }
+
+    function updateLiveChargesPreview() {
+      const weight = parseFloat(document.getElementById('reqWeightInput').value) || 5.0;
+      const rate = parseInt(document.getElementById('reqMaterialSelect').value, 10) || 10;
+      const grossTokens = Math.round(weight * rate);
+      const grossRupees = grossTokens * 2;
+      
+      const pickupFee = 30;
+      const scaleFee = 15;
+      const netTokens = grossTokens;
+
+      document.getElementById('prevGrossVal').textContent = `${grossTokens} ECO (₹${grossRupees})`;
+      document.getElementById('prevPickupFee').textContent = `- ₹${pickupFee}`;
+      document.getElementById('prevScaleFee').textContent = `- ₹${scaleFee}`;
+      document.getElementById('prevNetVal').textContent = `${netTokens} ECO (Net Payout)`;
+    }
+
+    /* Customer Dashboard */
+    function initCitizenDashboard() {
+      closeModals();
+      document.getElementById('landingView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+      document.getElementById('ownerCustRequestCard').style.display = 'none';
+      document.getElementById('customerProgressSection').style.display = 'block';
+      document.getElementById('guestActions').style.display = 'none';
+      document.getElementById('userActions').style.display = 'flex';
+
+      document.getElementById('navUserBadge').textContent = currentCustomerSession.name;
+      document.getElementById('dashRolePill').textContent = 'Verified Customer Account';
+      document.getElementById('dashWelcomeTitle').textContent = `${currentCustomerSession.name}'s Waste & Token Wallet`;
+
+      document.getElementById('dashMetrics').innerHTML = `
+        <div class="stat-card"><span>Token Balance</span><h3>${currentCustomerSession.tokens} ECO</h3></div>
+        <div class="stat-card"><span>Total Diverted</span><h3>${currentCustomerSession.weight.toFixed(1)} kg</h3></div>
+        <div class="stat-card"><span>Active Requests</span><h3 style="color:var(--blue);">${customerRequests.filter(r => r.customer.toLowerCase() === currentCustomerSession.email.toLowerCase()).length}</h3></div>
+        <div class="stat-card"><span>Civic Tier</span><h3>Silver Recycler</h3></div>
+      `;
+
+      document.getElementById('primaryActionCard').innerHTML = `
+        <div class="card-head"><h3>Instant Smart Hub Drop-off</h3><span class="status-pill status-active">Instant Mint</span></div>
+        <div class="form-group"><label>Selected Collection Hub</label><select id="dropHubSelect"><option>Smart Hub #04 - Green Park, Meerut</option><option>Central Connaught Bin, Delhi</option><option>Cyber City Smart Hub, Bengaluru</option></select></div>
+        <div class="form-group"><label>Material Stream</label><select id="dropStreamSelect"><option value="10">PET Bottles (10 ECO/kg)</option><option value="25">Aluminium Cans (25 ECO/kg)</option></select></div>
+        <div class="form-group"><label>Scale Weight (kg)</label><input type="number" id="dropWeightInput" value="3.5" min="0.1" step="0.1" /></div>
+        <button class="btn btn-primary btn-block" onclick="executeCitizenDeposit()">Confirm &amp; Mint Tokens</button>
+      `;
+
+      document.getElementById('secondaryActionCard').innerHTML = `
+        <div class="card-head"><h3>Place Doorstep Pickup Order</h3><span class="status-pill status-blue">Doorstep Weighing</span></div>
+        
+        <label style="display:block; font-size:0.8rem; font-weight:700; margin-bottom:0.4rem;">Select Payment Mode:</label>
+        <div class="pay-mode-selector">
+          <div class="pay-mode-option selected" id="payModeAdvance" onclick="setPaymentMode('advance')">
+            <div class="pay-mode-title">⚡ Advance Token Pay</div>
+            <div class="pay-mode-desc">+80% instant token credit minted upfront upon order.</div>
+          </div>
+          <div class="pay-mode-option" id="payModeVisit" onclick="setPaymentMode('visit')">
+            <div class="pay-mode-title">⚖️ On-Site Visit Pay</div>
+            <div class="pay-mode-desc">100% token payout released on spot after scale verification.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Material to Recycle</label>
+          <select id="reqMaterialSelect" onchange="updateLiveChargesPreview()">
+            <option value="10">PET Plastic Bottles (10 ECO/kg)</option>
+            <option value="25">Aluminium Beverage Cans (25 ECO/kg)</option>
+            <option value="8">Rigid HDPE Containers (8 ECO/kg)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estimated Weight (kg)</label>
+          <input type="number" id="reqWeightInput" value="5.0" min="0.5" step="0.5" oninput="updateLiveChargesPreview()" />
+        </div>
+        <div class="form-group">
+          <label>Pickup Place / Home Address</label>
+          <input type="text" id="reqPlaceInput" placeholder="e.g. Flat 402, Green Park Main Market, Meerut" required />
+        </div>
+
+        <div class="charges-box">
+          <div style="font-weight:800; font-size:0.8rem; margin-bottom:0.4rem; color:var(--text-main);">Itemized Order Calculation:</div>
+          <div class="charge-row"><span>Gross Token Yield:</span><span id="prevGrossVal">50 ECO (₹100)</span></div>
+          <div class="charge-row"><span>Doorstep Logistics &amp; Transport Fee:</span><span id="prevPickupFee">- ₹30</span></div>
+          <div class="charge-row"><span>IoT Calibrated Scale Verification Fee:</span><span id="prevScaleFee">- ₹15</span></div>
+          <div class="charge-row total-row"><span>Net Customer Token Yield:</span><span id="prevNetVal" style="color:var(--primary);">50 ECO</span></div>
+        </div>
+
+        <button class="btn btn-blue btn-block" onclick="raiseCustomerRequest()">🚀 Confirm &amp; Place Order</button>
+      `;
+
+      document.getElementById('dashTableHeading').textContent = 'Your Placed Orders History';
+      document.getElementById('dashTableHead').innerHTML = `<tr><th>Ticket ID</th><th>Pickup Address</th><th>Material</th><th>Pay Mode</th><th>Weight</th><th>Fees</th><th>Net Yield</th><th>Status</th></tr>`;
+      
+      renderCustomerProgressPipeline();
+      renderCitizenTable();
+    }
+
+    function renderCustomerProgressPipeline() {
+      const myRequests = customerRequests.filter(r => r.customer.toLowerCase() === currentCustomerSession.email.toLowerCase());
+      const fillBar = document.getElementById('progressLineFill');
+      const statusText = document.getElementById('activeTicketStatusText');
+      const statusPill = document.getElementById('activeTicketPill');
+
+      const node1 = document.getElementById('stepNode1');
+      const node2 = document.getElementById('stepNode2');
+      const node3 = document.getElementById('stepNode3');
+      const node4 = document.getElementById('stepNode4');
+
+      if (myRequests.length === 0) {
+        fillBar.style.width = '0%';
+        statusText.textContent = 'No active disposal orders. Place an order to begin tracking!';
+        statusPill.textContent = 'Idle';
+        node1.className = 'step-node';
+        node2.className = 'step-node';
+        node3.className = 'step-node';
+        node4.className = 'step-node';
+        return;
+      }
+
+      const latest = myRequests[0];
+      if (latest.status === 'Completed & Closed') {
+        fillBar.style.width = '100%';
+        statusText.textContent = `Ticket ${latest.id}: Order Completed & Closed by Recycler. Net tokens disbursed!`;
+        statusPill.textContent = 'Completed & Closed';
+        statusPill.className = 'status-pill status-active';
+        node1.className = 'step-node completed';
+        node2.className = 'step-node completed';
+        node3.className = 'step-node completed';
+        node4.className = 'step-node completed';
+      } else if (latest.status === 'On The Way') {
+        fillBar.style.width = '50%';
+        statusText.textContent = `Ticket ${latest.id}: Collector is ON THE WAY to ${latest.place} with digital IoT scale!`;
+        statusPill.textContent = '🚚 Collector On The Way';
+        statusPill.className = 'status-pill status-warning';
+        node1.className = 'step-node completed';
+        node2.className = 'step-node active';
+        node3.className = 'step-node';
+        node4.className = 'step-node';
+      } else {
+        fillBar.style.width = '25%';
+        statusText.textContent = `Ticket ${latest.id}: Order placed at ${latest.place}. Waiting for dispatcher.`;
+        statusPill.textContent = 'Order Placed';
+        statusPill.className = 'status-pill status-blue';
+        node1.className = 'step-node completed';
+        node2.className = 'step-node';
+        node3.className = 'step-node';
+        node4.className = 'step-node';
+      }
+    }
+
+    function renderCitizenTable() {
+      const tbody = document.getElementById('dashTableBody');
+      tbody.innerHTML = '';
+      customerRequests.filter(r => r.customer.toLowerCase() === currentCustomerSession.email.toLowerCase()).forEach(req => {
+        const row = tbody.insertRow();
+        const pillClass = req.status === 'Completed & Closed' ? 'status-active' : (req.status === 'On The Way' ? 'status-warning' : 'status-blue');
+        row.innerHTML = `
+          <td><strong>${req.id}</strong></td>
+          <td>${sanitize(req.place || 'Meerut')}</td>
+          <td>${req.material}</td>
+          <td><span class="status-pill status-blue">${req.payMode || 'On-Site Visit Pay'}</span></td>
+          <td>${req.verifiedWeight} kg</td>
+          <td>₹${(req.pickupFee || 30) + (req.scaleFee || 15)} (Fees)</td>
+          <td><strong>${req.netTokens || req.grossTokens} ECO</strong></td>
+          <td><span class="status-pill ${pillClass}">${req.status}</span></td>
+        `;
+      });
+    }
+
+    /* Customer Submits Order */
+    function raiseCustomerRequest(customMat, customWeight, customNote, customPayMode, customPlace) {
+      if (!checkCustomerAuth()) return null;
+
+      const mat = customMat || document.getElementById('reqMaterialSelect').options[document.getElementById('reqMaterialSelect').selectedIndex].text.split(' (')[0];
+      const weight = customWeight || parseFloat(document.getElementById('reqWeightInput').value);
+      const place = customPlace || (document.getElementById('reqPlaceInput') && document.getElementById('reqPlaceInput').value.trim() ? document.getElementById('reqPlaceInput').value.trim() : 'Green Park Sector 2, Meerut');
+      const note = customNote || 'Standard Household Lot';
+      const payMode = customPayMode || (selectedPayMode === 'advance' ? 'Advance Token Pay' : 'On-Site Visit Pay');
+      
+      const rate = mat.includes('Alum') ? 25 : 10;
+      const grossTokens = Math.round(weight * rate);
+      const pickupFee = 30;
+      const scaleFee = 15;
+      const netTokens = grossTokens;
+
+      const ticketId = 'REQ-' + Math.floor(Math.random() * 899 + 100);
+      const fakeHash = '0x' + Math.random().toString(16).substring(2, 6) + '...' + Math.random().toString(16).substring(2, 6);
+
+      if (payMode === 'Advance Token Pay') {
+        const advanceTokens = Math.round(netTokens * 0.8);
+        currentCustomerSession.tokens += advanceTokens;
+        localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+        showToast(`⚡ Advance Token Pay: +${advanceTokens} ECO credited upfront!`);
+      }
+
+      const newReq = {
+        id: ticketId,
+        customer: currentCustomerSession.email,
+        place: sanitize(place),
+        material: mat,
+        payMode: payMode,
+        claimedWeight: weight,
+        verifiedWeight: weight,
+        rate: rate,
+        grossTokens: grossTokens,
+        pickupFee: pickupFee,
+        scaleFee: scaleFee,
+        netTokens: netTokens,
+        note: note,
+        status: 'Order Placed'
+      };
+
+      customerRequests.unshift(newReq);
+      localStorage.setItem('ecotoken_requests', JSON.stringify(customerRequests));
+
+      appendOrderToLiveFeed(`${currentCustomerSession.name} (${place})`, `${mat} [${payMode}]`, weight, netTokens, fakeHash, true);
+
+      totalOrders += 1;
+      grossRevenue += netTokens * 18;
+      document.getElementById('liveTotalOrders').textContent = totalOrders.toLocaleString();
+      document.getElementById('liveGrossRevenue').textContent = formatRupees(grossRevenue);
+
+      fireConfetti('citizen');
+      showToast(`Order ${ticketId} placed! Fees: ₹${pickupFee + scaleFee}. Tracking pipeline active.`);
+      initCitizenDashboard();
+      return newReq;
+    }
+
+    function executeCitizenDeposit() {
+      if (!checkCustomerAuth()) return;
+
+      const weight = parseFloat(document.getElementById('dropWeightInput').value);
+      const streamSelect = document.getElementById('dropStreamSelect');
+      const rate = parseInt(streamSelect.value, 10);
+      const mat = streamSelect.options[streamSelect.selectedIndex].text.split(' (')[0];
+      const hub = document.getElementById('dropHubSelect').value;
+      const earned = Math.round(weight * rate);
+      const fakeHash = '0x' + Math.random().toString(16).substring(2, 6) + '...' + Math.random().toString(16).substring(2, 6);
+
+      currentCustomerSession.tokens += earned;
+      currentCustomerSession.weight += weight;
+      localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+
+      appendOrderToLiveFeed(`${currentCustomerSession.name} (${hub})`, mat, weight, earned, fakeHash, true);
+
+      totalOrders += 1;
+      grossRevenue += earned * 15;
+      document.getElementById('liveTotalOrders').textContent = totalOrders.toLocaleString();
+      document.getElementById('liveGrossRevenue').textContent = formatRupees(grossRevenue);
+
+      fireConfetti('citizen');
+      showToast(`Deposited ${weight} kg at ${hub}! Earned +${earned} ECO tokens.`);
+      initCitizenDashboard();
+    }
+
+    /* OWNER DASHBOARD: DISPATCH & ORDER CLOSURE */
+    function initOwnerDashboard() {
+      closeModals();
+      document.getElementById('landingView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+      document.getElementById('ownerCustRequestCard').style.display = 'block';
+      document.getElementById('customerProgressSection').style.display = 'none';
+      document.getElementById('guestActions').style.display = 'none';
+      document.getElementById('userActions').style.display = 'flex';
+
+      document.getElementById('navUserBadge').textContent = 'Ashwani (Admin)';
+      document.getElementById('dashRolePill').textContent = 'Registered Recycler Terminal';
+      document.getElementById('dashWelcomeTitle').textContent = 'Owner Terminal & Live Dispatch Center';
+
+      document.getElementById('dashMetrics').innerHTML = `
+        <div class="stat-card"><span>Total Handled</span><h3>4,820 kg</h3></div>
+        <div class="stat-card"><span>Open Cases</span><h3>${ownerBatches.length}</h3></div>
+        <div class="stat-card"><span>Active Orders</span><h3 style="color:var(--blue);">${customerRequests.length}</h3></div>
+        <div class="stat-card"><span>Purity Avg</span><h3>96.4%</h3></div>
+      `;
+
+      document.getElementById('primaryActionCard').innerHTML = `
+        <div class="card-head"><h3>Certify Inbound Batch</h3></div>
+        <div class="form-group"><label>Batch ID</label><input type="text" id="certBatchId" value="BATCH-NCR-905" /></div>
+        <div class="form-group"><label>Weight (kg)</label><input type="number" id="certWeightInput" value="500" /></div>
+        <button class="btn btn-primary btn-block" onclick="showToast('Batch certified on-chain')">Certify Batch</button>
+      `;
+
+      document.getElementById('secondaryActionCard').innerHTML = `
+        <div class="card-head"><h3>Escrow Reserve</h3></div>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Settlements disburse directly to facility upon batch completion[cite: 1].</p>
+        <h3 style="color:var(--primary); font-size:1.5rem; margin-bottom:1rem;">$12,450.00 USDC</h3>
+        <button class="btn btn-outline btn-block" onclick="showToast('Escrow status verified on-chain')">Audit Smart Contracts</button>
+      `;
+
+      renderOwnerRequestsTable();
+    }
+
+    function refreshOwnerLiveOrders() {
+      customerRequests = JSON.parse(localStorage.getItem('ecotoken_requests')) || customerRequests;
+      renderOwnerRequestsTable();
+      showToast('Live Terminal Refreshed! Synced with customer orders.', 'gold');
+    }
+
+    function renderOwnerRequestsTable() {
+      const reqBody = document.getElementById('custRequestTableBody');
+      reqBody.innerHTML = '';
+
+      customerRequests.forEach((req, i) => {
+        const row = reqBody.insertRow();
+        const isClosed = req.status === 'Completed & Closed';
+        const isOnWay = req.status === 'On The Way';
+        const pillClass = isClosed ? 'status-active' : (isOnWay ? 'status-warning' : 'status-blue');
+
+        let actionHtml = '';
+        if (isClosed) {
+          actionHtml = `<span class="status-pill status-active">✓ Order Closed</span>`;
+        } else if (isOnWay) {
+          actionHtml = `<button class="btn btn-primary btn-sm" onclick="closeCustomerOrder(${i})">Complete &amp; Close Order</button>`;
+        } else {
+          actionHtml = `
+            <div style="display:flex; gap:0.4rem;">
+              <button class="btn btn-gold btn-sm" onclick="markOrderOnTheWay(${i})">Mark On The Way</button>
+              <button class="btn btn-primary btn-sm" onclick="closeCustomerOrder(${i})">Close Order</button>
+            </div>
+          `;
+        }
+
+        row.innerHTML = `
+          <td><strong>${req.id}</strong></td>
+          <td>${req.customer}</td>
+          <td><strong>📍 ${sanitize(req.place || 'Meerut Hub')}</strong></td>
+          <td>${req.material}</td>
+          <td><span class="status-pill status-blue">${req.payMode || 'On-Site Visit Pay'}</span></td>
+          <td>${req.claimedWeight} kg</td>
+          <td style="font-size:0.75rem; color:var(--text-muted);">
+            Logistics: ₹${req.pickupFee || 30}<br>Scale Fee: ₹${req.scaleFee || 15}
+          </td>
+          <td><strong>${req.netTokens || req.grossTokens} ECO</strong></td>
+          <td><span class="status-pill ${pillClass}">${req.status}</span></td>
+          <td>${actionHtml}</td>
+        `;
+      });
+    }
+
+    /* OWNER ACTIONS */
+    function markOrderOnTheWay(index) {
+      const req = customerRequests[index];
+      req.status = 'On The Way';
+      localStorage.setItem('ecotoken_requests', JSON.stringify(customerRequests));
+
+      showToast(`Order ${req.id} is now marked ON THE WAY to ${req.place}!`, 'gold');
+      renderOwnerRequestsTable();
+    }
+
+    function closeCustomerOrder(index) {
+      const req = customerRequests[index];
+      req.status = 'Completed & Closed';
+
+      const targetCit = registeredCitizens.find(c => c.email.toLowerCase() === req.customer.toLowerCase());
+      if (targetCit) {
+        const payout = req.payMode === 'Advance Token Pay' ? Math.round(req.netTokens * 0.2) : req.netTokens;
+        targetCit.tokens += payout;
+        targetCit.weight += req.claimedWeight;
+        localStorage.setItem('ecotoken_citizens', JSON.stringify(registeredCitizens));
+      }
+
+      localStorage.setItem('ecotoken_requests', JSON.stringify(customerRequests));
+      fireConfetti('owner');
+      showToast(`Order ${req.id} completed & closed! Net tokens disbursed to ${req.customer}.`, 'gold');
+      renderOwnerRequestsTable();
+    }
+
+    /* AI Assistant */
+    function toggleAIChat() {
+      document.getElementById('aiChatWindow').classList.toggle('active');
+    }
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById('aiUserInput').value = promptText;
+      sendAIMessage();
+    }
+
+    function sendAIMessage() {
+      const input = document.getElementById('aiUserInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendAIMsg(text, 'user');
+      input.value = '';
+
+      setTimeout(() => {
+        const q = text.toLowerCase();
+
+        if (q.includes('charge') || q.includes('fee') || q.includes('cost') || q.includes('breakdown')) {
+          appendAIMsg(`💵 <strong>Separate Charges Breakdown:</strong><br>
+          • <strong>Gross Material Yield:</strong> Calculated directly based on kg (10 ECO/kg for plastic, 25 ECO/kg for cans)[cite: 1]!<br>
+          • <strong>Doorstep Handling Fee:</strong> Fixed ₹30 logistics charge.<br>
+          • <strong>Calibrated IoT Scale Fee:</strong> Fixed ₹15 certified inspection charge.<br>
+          Net tokens are disbursed cleanly with complete transparency!`, 'bot');
+          return;
+        }
+
+        if (q.includes('advance') || q.includes('visit') || q.includes('pay mode') || q.includes('payment')) {
+          appendAIMsg(`💳 <strong>Payment Modes:</strong><br>
+          1. <strong>⚡ Advance Token Pay:</strong> Receive an instant 80% provisional token credit immediately upon placing the order! The remaining reconciles after collection.<br>
+          2. <strong>⚖️ On-Site Visit Pay:</strong> 100% payout released at your doorstep after the collector arrives with the digital scale[cite: 1]!`, 'bot');
+          return;
+        }
+
+        const weightMatch = q.match(/(\d+(\.\d+)?)\s*(kg|kilos|kilo|kgs)?/);
+        const weight = weightMatch ? parseFloat(weightMatch[1]) : 3.0;
+
+        if (q.includes('order') || q.includes('pickup') || q.includes('recycle') || q.includes('place')) {
+          if (!currentCustomerSession) {
+            appendAIMsg(`🔒 <strong>Login Required:</strong> Please <a href="javascript:void(0)" onclick="openCustomerAuth(); toggleAIChat();" style="color:var(--primary); font-weight:800; text-decoration:underline;">Click Here to Sign In</a> with Google, X, or Email before placing an order!`, 'bot');
+            return;
+          }
+          const mat = q.includes('can') || q.includes('alum') ? 'Aluminium Beverage Cans' : 'PET Plastic Bottles';
+          const isAdvance = q.includes('advance');
+          const payMode = isAdvance ? 'Advance Token Pay' : 'On-Site Visit Pay';
+          const place = 'Green Park Main Market (AI Order)';
+          
+          const newReq = raiseCustomerRequest(mat, weight, 'AI Order', payMode, place);
+          appendAIMsg(`✅ <strong>Order Placed & Tracking Active!</strong><br>
+          • Ticket: <code>${newReq.id}</code><br>
+          • Address: <strong>${place}</strong><br>
+          • Fees: <strong>₹45 (Separate Handling & Scale Fee)</strong><br>
+          • Mode: <strong>${payMode}</strong><br>
+          Net Yield: <strong>+${newReq.netTokens} ECO</strong>. Owner can dispatch collector now!`, 'bot');
+          return;
+        }
+
+        appendAIMsg(`🤖 I am your EcoToken guide! Try asking:<br>
+        • <em>"What are the separate pickup charges?"</em><br>
+        • <em>"What is advance pay vs visit pay?"</em><br>
+        • <em>"Place order for 5 kg plastic with Advance Pay at Green Park"</em>`, 'bot');
+      }, 400);
+    }
+
+    function appendAIMsg(txt, sender) {
+      const body = document.getElementById('aiMessages');
+      const div = document.createElement('div');
+      div.className = `ai-msg ${sender === 'user' ? 'ai-msg-user' : 'ai-msg-bot'}`;
+      div.innerHTML = txt;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+  </script>
+</body>
+</html>
